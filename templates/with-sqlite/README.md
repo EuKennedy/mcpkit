@@ -1,7 +1,7 @@
 # __PROJECT_NAME__
 
 An MCP server backed by SQLite. Scaffolded with
-[mcp-kit](https://github.com/EuKennedy/mcp-kit).
+[mcpkit](https://github.com/EuKennedy/mcpkit).
 
 A working CRUD example over a `notes` table — create, get, list, search,
 update, delete. Use it as a reference for wiring real persistence into an

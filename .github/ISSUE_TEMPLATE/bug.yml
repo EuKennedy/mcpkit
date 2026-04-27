@@ -8,7 +8,7 @@ body:
       label: what happened?
       description: what did you try, what did you expect, what actually happened
       placeholder: |
-        I ran `mcp-kit create my-server` and ...
+        I ran `mcpkit create my-server` and ...
     validations:
       required: true
   - type: textarea
@@ -20,7 +20,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: mcp-kit version
+      label: mcpkit version
       placeholder: 0.1.0
     validations:
       required: true

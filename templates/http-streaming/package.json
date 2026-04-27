@@ -4,13 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "mcp-kit dev",
-    "build": "mcp-kit build",
+    "dev": "mcpkit dev",
+    "build": "mcpkit build",
     "start": "node dist/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "mcp-kit": "__MCP_KIT_VERSION__",
+    "mcpkit": "__MCP_KIT_VERSION__",
     "zod": "^3.23.8"
   },
   "devDependencies": {

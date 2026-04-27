@@ -20,7 +20,7 @@ function readVersion(): string {
 const program = new Command();
 
 program
-  .name('mcp-kit')
+  .name('mcpkit')
   .description('Build MCP servers in TypeScript without the boilerplate.')
   .version(readVersion(), '-v, --version', 'print version and exit')
   .showHelpAfterError();

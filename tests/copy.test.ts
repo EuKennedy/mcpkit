@@ -8,7 +8,7 @@ describe('copyTemplate', () => {
   let scratch: string;
 
   beforeEach(async () => {
-    scratch = await mkdtemp(join(tmpdir(), 'mcp-kit-test-'));
+    scratch = await mkdtemp(join(tmpdir(), 'mcpkit-test-'));
   });
 
   afterEach(async () => {

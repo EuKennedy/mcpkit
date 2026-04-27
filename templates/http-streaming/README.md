@@ -1,7 +1,7 @@
 # __PROJECT_NAME__
 
 An MCP server over HTTP (streamable transport), scaffolded with
-[mcp-kit](https://github.com/EuKennedy/mcp-kit).
+[mcpkit](https://github.com/EuKennedy/mcpkit).
 
 Use this template when you want your server reachable over the network — for
 hosted deployments, multi-tenant agents, or simply because stdio is awkward in

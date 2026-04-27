@@ -1,5 +1,5 @@
 {
-  "name": "mcp-kit",
+  "name": "mcpkit",
   "version": "0.1.0",
   "description": "The TypeScript toolkit for building MCP servers without the boilerplate.",
   "keywords": [
@@ -13,13 +13,13 @@
     "cli",
     "scaffolding"
   ],
-  "homepage": "https://github.com/EuKennedy/mcp-kit",
+  "homepage": "https://github.com/EuKennedy/mcpkit",
   "bugs": {
-    "url": "https://github.com/EuKennedy/mcp-kit/issues"
+    "url": "https://github.com/EuKennedy/mcpkit/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EuKennedy/mcp-kit.git"
+    "url": "git+https://github.com/EuKennedy/mcpkit.git"
   },
   "license": "MIT",
   "author": "Kennedy",
@@ -38,7 +38,7 @@
     }
   },
   "bin": {
-    "mcp-kit": "./dist/cli.js"
+    "mcpkit": "./dist/cli.js"
   },
   "files": ["dist", "templates", "README.md", "LICENSE"],
   "engines": {
