@@ -23,8 +23,7 @@ const server = defineServer({
   tools: [
     defineTool({
       name: 'http_get',
-      description:
-        'Fetch a URL with GET and return its body. Truncates after 100KB.',
+      description: 'Fetch a URL with GET and return its body. Truncates after 100KB.',
       input: z.object({
         url: z.string().url(),
         headers: z.record(z.string()).optional(),
@@ -33,8 +32,7 @@ const server = defineServer({
       handler: async ({ url, headers, timeoutMs }) => {
         const response = await fetchWithTimeout(url, { headers, timeoutMs });
         const text = await response.text();
-        const truncated =
-          text.length > 100_000 ? `${text.slice(0, 100_000)}\n…[truncated]` : text;
+        const truncated = text.length > 100_000 ? `${text.slice(0, 100_000)}\n…[truncated]` : text;
         return [
           {
             type: 'text' as const,

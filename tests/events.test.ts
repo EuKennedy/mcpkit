@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { defineServer, defineTool, formatEvent, type ServerEvent } from '../src/index.js';
+import { type ServerEvent, defineServer, defineTool, formatEvent } from '../src/index.js';
 import { createTestClient } from '../src/testing/index.js';
 
 describe('lifecycle events', () => {
@@ -92,9 +92,9 @@ describe('lifecycle events', () => {
 
 describe('formatEvent', () => {
   it('formats tool.start', () => {
-    expect(
-      formatEvent({ type: 'tool.start', tool: 'a', input: {}, requestId: 'r' }),
-    ).toBe('→ a() [r]');
+    expect(formatEvent({ type: 'tool.start', tool: 'a', input: {}, requestId: 'r' })).toBe(
+      '→ a() [r]',
+    );
   });
   it('formats successful tool.end', () => {
     expect(
