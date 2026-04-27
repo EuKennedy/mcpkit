@@ -1,0 +1,12 @@
+src/
+tests/
+.github/
+.editorconfig
+.gitignore
+biome.json
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+*.tsbuildinfo
+coverage/
+node_modules/
