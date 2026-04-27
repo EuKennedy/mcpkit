@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: node ${{ matrix.node }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [18, 20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: typecheck
+        run: npx tsc --noEmit
+
+      - name: lint
+        run: npm run lint
+
+      - name: test
+        run: npm test
+
+      - name: build
+        run: npm run build
+
+      - name: scaffold a project end-to-end
+        shell: bash
+        run: |
+          node ./dist/cli.js create /tmp/e2e-stdio -t stdio-basic --no-install -y
+          node ./dist/cli.js create /tmp/e2e-http -t http-streaming --no-install -y
+          test -f /tmp/e2e-stdio/src/index.ts
+          test -f /tmp/e2e-http/src/index.ts
+          grep -q '"name": "e2e-stdio"' /tmp/e2e-stdio/package.json
