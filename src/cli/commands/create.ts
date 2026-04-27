@@ -17,6 +17,16 @@ const TEMPLATES = [
     title: 'http (streamable)',
     description: 'Network-reachable MCP server over streamable HTTP.',
   },
+  {
+    id: 'with-fetch',
+    title: 'with-fetch',
+    description: 'stdio server with HTTP-fetching tools (timeouts included).',
+  },
+  {
+    id: 'with-sqlite',
+    title: 'with-sqlite',
+    description: 'stdio server backed by a SQLite CRUD example.',
+  },
 ] as const;
 
 export interface CreateOptions {
