@@ -1,5 +1,10 @@
 # mcp-kit
 
+[![ci](https://github.com/EuKennedy/mcp-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/EuKennedy/mcp-kit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/mcp-kit.svg)](https://www.npmjs.com/package/mcp-kit)
+[![node](https://img.shields.io/node/v/mcp-kit.svg)](https://www.npmjs.com/package/mcp-kit)
+[![license](https://img.shields.io/npm/l/mcp-kit.svg)](LICENSE)
+
 **The TypeScript toolkit for building MCP servers without the boilerplate.**
 
 Define a tool with a Zod schema and a handler. Get a working
@@ -28,7 +33,7 @@ await server.start();
 ```
 
 That's a real, functioning MCP server. Run it with `mcp-kit dev` and point any
-client at it.
+MCP-aware client at it.
 
 ---
 
@@ -49,6 +54,92 @@ is generated from your Zod type, validation runs before your handler, errors
 turn into proper protocol responses, and a string return becomes a text
 content block. You stay in the layer that actually matters — what the tool
 does — and skip the layer that doesn't.
+
+## with vs without
+
+Same tool, written against the bare SDK and against `mcp-kit`:
+
+<table>
+<tr>
+<th>bare sdk</th>
+<th>mcp-kit</th>
+</tr>
+<tr>
+<td>
+
+```ts
+const server = new Server(
+  { name: 'demo', version: '0.1.0' },
+  { capabilities: { tools: {} } },
+);
+
+server.setRequestHandler(
+  ListToolsRequestSchema,
+  async () => ({
+    tools: [
+      {
+        name: 'add',
+        description: 'Add two numbers.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            a: { type: 'number' },
+            b: { type: 'number' },
+          },
+          required: ['a', 'b'],
+        },
+      },
+    ],
+  }),
+);
+
+server.setRequestHandler(
+  CallToolRequestSchema,
+  async (req) => {
+    if (req.params.name === 'add') {
+      const { a, b } = req.params.arguments as {
+        a: number; b: number;
+      };
+      return {
+        content: [{ type: 'text', text: `${a + b}` }],
+      };
+    }
+    throw new Error('unknown tool');
+  },
+);
+
+await server.connect(new StdioServerTransport());
+```
+
+</td>
+<td>
+
+```ts
+const server = defineServer({
+  name: 'demo',
+  version: '0.1.0',
+  tools: [
+    defineTool({
+      name: 'add',
+      description: 'Add two numbers.',
+      input: z.object({
+        a: z.number(),
+        b: z.number(),
+      }),
+      handler: ({ a, b }) => `${a + b}`,
+    }),
+  ],
+});
+
+await server.start();
+```
+
+</td>
+</tr>
+</table>
+
+The right column has the same wire-level behavior, plus input validation,
+plus typed handler arguments, plus an `isError` envelope on uncaught throws.
 
 ## install
 
@@ -77,11 +168,14 @@ mcp-kit build             compile to dist/
 mcp-kit inspect           launch the official inspector against your server
 ```
 
-`create` ships with two templates today:
+`create` ships with four templates today:
 
-- **stdio-basic** — a local server over stdio. Most clients want this.
-- **http-streaming** — a network-reachable server over the streamable HTTP
-  transport. Use it when stdio isn't a fit (hosted deployments, multi-tenant).
+| template          | what you get                                                              |
+| ----------------- | ------------------------------------------------------------------------- |
+| `stdio-basic`     | local MCP server over stdio. most clients want this.                      |
+| `http-streaming`  | network-reachable server over the streamable HTTP transport.              |
+| `with-fetch`      | stdio server with HTTP-fetching tools (timeouts wired in).                |
+| `with-sqlite`     | stdio server with a SQLite-backed CRUD example (better-sqlite3, WAL).     |
 
 ## the api
 
@@ -112,6 +206,7 @@ defineServer({
   resources?: ResourceDefinition[],
   prompts?: PromptDefinition[],
   onToolError?: (err, toolName) => ToolResult,
+  onEvent?: (event: ServerEvent) => void,
 })
 ```
 
@@ -145,6 +240,28 @@ definePrompt({
 });
 ```
 
+### observability
+
+`onEvent` gets a structured callback for every tool call, resource read, and
+prompt fetch — start time, end time, latency, error, a per-call `requestId`
+to correlate. You can plug it into anything: `pino`, `console`, OpenTelemetry,
+your homemade aggregator. There's also a built-in for the simple case:
+
+```ts
+import { defineServer, consoleLogger, jsonLogger } from 'mcp-kit';
+
+const server = defineServer({
+  name: 'demo',
+  version: '0.1.0',
+  onEvent: consoleLogger(),    // → pretty stderr lines
+  // or: onEvent: jsonLogger() // → one JSON object per line, on stderr
+  tools: [...]
+});
+```
+
+Logging always goes to stderr — stdout is reserved for protocol traffic on
+stdio transports.
+
 ## testing
 
 `mcp-kit/testing` exposes an in-process client that talks to your server
@@ -154,7 +271,7 @@ RAM.
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { createTestClient } from 'mcp-kit/testing';
+import { createTestClient, expectToolError, snapshotTools } from 'mcp-kit/testing';
 import { server } from '../src/index.js';
 
 describe('add', () => {
@@ -164,6 +281,17 @@ describe('add', () => {
     expect(result.text).toBe('5');
     expect(result.isError).toBe(false);
     await client.close();
+  });
+
+  it('rejects bad input', async () => {
+    const client = await createTestClient(server);
+    const text = await expectToolError(client, 'add', { a: 'nope', b: 1 });
+    expect(text).toMatch(/invalid/i);
+    await client.close();
+  });
+
+  it("doesn't drift its public surface", () => {
+    expect(snapshotTools(server)).toMatchSnapshot();
   });
 });
 ```
@@ -189,6 +317,38 @@ template shows the wiring.
 `noUncheckedIndexedAccess`. The library itself compiles under the same
 settings. If you find a hole in the types, that's a bug.
 
+**Listener errors are swallowed.** If your `onEvent` handler throws, your
+tool calls keep working. Observability bugs shouldn't be load-bearing.
+
+## faq
+
+**Does this lock me into mcp-kit forever?**
+No. Every helper has an escape hatch — `server.raw` gives you the underlying
+SDK `Server`, and you can `setRequestHandler` on it directly if you need
+something the kit doesn't model yet. The kit is a layer on top, not a
+replacement.
+
+**Why Zod 3 and not 4?**
+Zod 4 is great but the ecosystem (notably `zod-to-json-schema`) is still
+catching up. We'll move when it's stable in production. If you're already
+on Zod 4, the schema interfaces are compatible enough — file an issue if you
+hit a wall.
+
+**Does it support resources and prompts, not just tools?**
+Yes. `defineResource` and `definePrompt` are first-class. They're less
+commonly used than tools, so most examples lead with tools — but the wiring
+is identical.
+
+**Streamable HTTP, SSE, both?**
+Streamable HTTP. The older HTTP+SSE flavor is still in the SDK but is being
+phased out — if you have a reason to need it, `defineServer` is transport-
+agnostic and you can pass any `Transport` instance via `.connect()`.
+
+**Production-ready?**
+The library is small and the surface is intentionally narrow. The official
+SDK does the heavy lifting underneath. Pin a version, write tests for your
+tools (the in-process client makes this easy), and you're set.
+
 ## what this is not
 
 - not a hosted service. you build, you deploy.
@@ -198,11 +358,10 @@ settings. If you find a hole in the types, that's a bug.
 
 ## roadmap
 
-- more templates (database-backed, oauth-protected, edge runtime).
+- more templates (oauth-protected, edge runtime, drizzle/postgres).
 - a `mcp-kit publish` command that lints + packages + tags a release.
-- richer testing helpers (snapshot of the tool list, schema diff against a
-  baseline).
-- optional structured logging hook.
+- richer testing helpers (fuzz a tool's input, schema diff against a baseline).
+- optional OpenTelemetry adapter for `onEvent`.
 
 If something's missing, [open an issue](https://github.com/EuKennedy/mcp-kit/issues)
 with a sketch of the API you'd want.
