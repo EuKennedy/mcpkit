@@ -1,15 +1,11 @@
-import { spawn, type SpawnOptions } from 'node:child_process';
+import { type SpawnOptions, spawn } from 'node:child_process';
 
 export interface RunOptions extends SpawnOptions {
   /** Forward signals (SIGINT/SIGTERM) from this process to the child. Default: true. */
   forwardSignals?: boolean;
 }
 
-export function run(
-  command: string,
-  args: string[],
-  options: RunOptions = {},
-): Promise<number> {
+export function run(command: string, args: string[], options: RunOptions = {}): Promise<number> {
   return new Promise((resolve, reject) => {
     const { forwardSignals = true, ...spawnOptions } = options;
     const child = spawn(command, args, {
