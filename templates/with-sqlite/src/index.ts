@@ -16,7 +16,7 @@ const listStmt = db.prepare<[number, number]>(
   'SELECT * FROM notes ORDER BY updated_at DESC LIMIT ? OFFSET ?',
 );
 const searchStmt = db.prepare<[string, string, number]>(
-  "SELECT * FROM notes WHERE title LIKE ? OR body LIKE ? ORDER BY updated_at DESC LIMIT ?",
+  'SELECT * FROM notes WHERE title LIKE ? OR body LIKE ? ORDER BY updated_at DESC LIMIT ?',
 );
 
 const server = defineServer({
@@ -62,8 +62,7 @@ const server = defineServer({
 
     defineTool({
       name: 'search_notes',
-      description:
-        'Search notes by substring in title or body. Case-sensitive (sqlite LIKE).',
+      description: 'Search notes by substring in title or body. Case-sensitive (sqlite LIKE).',
       input: z.object({
         query: z.string().min(1),
         limit: z.number().int().positive().max(100).default(20),

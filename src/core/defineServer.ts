@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -8,7 +9,6 @@ import {
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import type { EventListener } from './events.js';
@@ -216,11 +216,7 @@ function registerResources(
   });
 }
 
-function registerPrompts(
-  server: Server,
-  prompts: PromptDefinition[],
-  emit: EventListener,
-): void {
+function registerPrompts(server: Server, prompts: PromptDefinition[], emit: EventListener): void {
   const byName = new Map(prompts.map((p) => [p.name, p] as const));
 
   server.setRequestHandler(ListPromptsRequestSchema, async () => ({
