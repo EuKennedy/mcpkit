@@ -8,8 +8,10 @@ import {
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import type { EventListener } from './events.js';
 import { errorToToolResult, normalizeToolResult } from './normalize.js';
 import type {
   PromptDefinition,
@@ -64,9 +66,11 @@ export function defineServer(options: ServerOptions): DefinedServer {
 
   const server = new Server({ name: options.name, version: options.version }, { capabilities });
 
-  if (tools.length > 0) registerTools(server, tools, options.onToolError);
-  if (resources.length > 0) registerResources(server, resources);
-  if (prompts.length > 0) registerPrompts(server, prompts);
+  const emit: EventListener = options.onEvent ?? (() => {});
+
+  if (tools.length > 0) registerTools(server, tools, options.onToolError, emit);
+  if (resources.length > 0) registerResources(server, resources, emit);
+  if (prompts.length > 0) registerPrompts(server, prompts, emit);
 
   let activeTransport: ConnectableTransport | undefined;
 
@@ -99,7 +103,8 @@ export function defineServer(options: ServerOptions): DefinedServer {
 function registerTools(
   server: Server,
   tools: ToolDefinition[],
-  onToolError?: ServerOptions['onToolError'],
+  onToolError: ServerOptions['onToolError'] | undefined,
+  emit: EventListener,
 ): void {
   const byName = new Map(tools.map((t) => [t.name, t] as const));
 
@@ -136,10 +141,37 @@ function registerTools(
       };
     }
 
+    const requestId = randomUUID();
+    const startedAt = performance.now();
+    safeEmit(emit, {
+      type: 'tool.start',
+      tool: tool.name,
+      input: parsed.data,
+      requestId,
+    });
+
     try {
       const raw = await tool.handler(parsed.data);
-      return normalizeToolResult(raw);
+      const result = normalizeToolResult(raw);
+      const durationMs = Math.round(performance.now() - startedAt);
+      safeEmit(emit, {
+        type: 'tool.end',
+        tool: tool.name,
+        requestId,
+        durationMs,
+        isError: result.isError === true,
+      });
+      return result;
     } catch (err) {
+      const durationMs = Math.round(performance.now() - startedAt);
+      const error = err instanceof Error ? err : new Error(String(err));
+      safeEmit(emit, {
+        type: 'tool.error',
+        tool: tool.name,
+        requestId,
+        durationMs,
+        error,
+      });
       if (onToolError) {
         return normalizeToolResult(onToolError(err, tool.name));
       }
@@ -148,7 +180,11 @@ function registerTools(
   });
 }
 
-function registerResources(server: Server, resources: ResourceDefinition[]): void {
+function registerResources(
+  server: Server,
+  resources: ResourceDefinition[],
+  emit: EventListener,
+): void {
   const byUri = new Map(resources.map((r) => [r.uri, r] as const));
 
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
@@ -165,6 +201,7 @@ function registerResources(server: Server, resources: ResourceDefinition[]): voi
     if (!resource) {
       throw new Error(`Unknown resource: ${request.params.uri}`);
     }
+    safeEmit(emit, { type: 'resource.read', uri: resource.uri });
     const result = await resource.read();
     return {
       contents: [
@@ -179,7 +216,11 @@ function registerResources(server: Server, resources: ResourceDefinition[]): voi
   });
 }
 
-function registerPrompts(server: Server, prompts: PromptDefinition[]): void {
+function registerPrompts(
+  server: Server,
+  prompts: PromptDefinition[],
+  emit: EventListener,
+): void {
   const byName = new Map(prompts.map((p) => [p.name, p] as const));
 
   server.setRequestHandler(ListPromptsRequestSchema, async () => ({
@@ -195,6 +236,7 @@ function registerPrompts(server: Server, prompts: PromptDefinition[]): void {
     if (!prompt) {
       throw new Error(`Unknown prompt: ${request.params.name}`);
     }
+    safeEmit(emit, { type: 'prompt.get', name: prompt.name });
     const args = prompt.arguments ? prompt.arguments.parse(request.params.arguments ?? {}) : {};
     const result = prompt.build(args);
     return {
@@ -202,6 +244,14 @@ function registerPrompts(server: Server, prompts: PromptDefinition[]): void {
       messages: result.messages,
     };
   });
+}
+
+function safeEmit(emit: EventListener, event: Parameters<EventListener>[0]): void {
+  try {
+    emit(event);
+  } catch {
+    // Swallow listener errors so observability bugs don't kill tool calls.
+  }
 }
 
 async function pickTransport(options: StartOptions): Promise<ConnectableTransport> {
