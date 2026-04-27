@@ -1,6 +1,6 @@
 {
   "name": "mcpkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The TypeScript toolkit for building MCP servers without the boilerplate.",
   "keywords": [
     "mcp",
