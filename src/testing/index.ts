@@ -54,10 +54,7 @@ export async function createTestClient(
     { capabilities: {} },
   );
 
-  await Promise.all([
-    server.connect(serverTransport as never),
-    client.connect(clientTransport),
-  ]);
+  await Promise.all([server.connect(serverTransport as never), client.connect(clientTransport)]);
 
   return {
     raw: client,

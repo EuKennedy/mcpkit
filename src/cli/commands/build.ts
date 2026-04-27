@@ -16,9 +16,7 @@ export async function buildCommand(options: BuildOptions): Promise<void> {
 
   const tscBin = resolveTscBin();
   if (!tscBin) {
-    log.error(
-      'typescript not found. install it as a devDependency: npm i -D typescript',
-    );
+    log.error('typescript not found. install it as a devDependency: npm i -D typescript');
     process.exit(1);
   }
 

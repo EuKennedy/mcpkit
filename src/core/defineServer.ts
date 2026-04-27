@@ -62,10 +62,7 @@ export function defineServer(options: ServerOptions): DefinedServer {
   if (resources.length > 0) capabilities.resources = {};
   if (prompts.length > 0) capabilities.prompts = {};
 
-  const server = new Server(
-    { name: options.name, version: options.version },
-    { capabilities },
-  );
+  const server = new Server({ name: options.name, version: options.version }, { capabilities });
 
   if (tools.length > 0) registerTools(server, tools, options.onToolError);
   if (resources.length > 0) registerResources(server, resources);
@@ -189,9 +186,7 @@ function registerPrompts(server: Server, prompts: PromptDefinition[]): void {
     prompts: prompts.map((p) => ({
       name: p.name,
       description: p.description,
-      arguments: p.arguments
-        ? extractArgumentsSchema(p.arguments)
-        : undefined,
+      arguments: p.arguments ? extractArgumentsSchema(p.arguments) : undefined,
     })),
   }));
 
@@ -200,9 +195,7 @@ function registerPrompts(server: Server, prompts: PromptDefinition[]): void {
     if (!prompt) {
       throw new Error(`Unknown prompt: ${request.params.name}`);
     }
-    const args = prompt.arguments
-      ? prompt.arguments.parse(request.params.arguments ?? {})
-      : {};
+    const args = prompt.arguments ? prompt.arguments.parse(request.params.arguments ?? {}) : {};
     const result = prompt.build(args);
     return {
       description: prompt.description,
@@ -246,9 +239,7 @@ function assertUniqueUris(items: { uri: string }[]): void {
 }
 
 function formatZodError(error: z.ZodError): string {
-  return error.errors
-    .map((e) => `  • ${e.path.join('.') || '(root)'}: ${e.message}`)
-    .join('\n');
+  return error.errors.map((e) => `  • ${e.path.join('.') || '(root)'}: ${e.message}`).join('\n');
 }
 
 function extractArgumentsSchema(

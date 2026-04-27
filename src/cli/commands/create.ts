@@ -138,7 +138,7 @@ export async function createCommand(
   }
 
   log.blank();
-  log.success(`done. next steps:`);
+  log.success('done. next steps:');
   log.blank();
   console.log(`  cd ${basename(targetPath)}`);
   if (!install) console.log('  npm install');

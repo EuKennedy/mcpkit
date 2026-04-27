@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import {
-  definePrompt,
-  defineResource,
-  defineServer,
-  defineTool,
-} from '../src/index.js';
+import { definePrompt, defineResource, defineServer, defineTool } from '../src/index.js';
 import { createTestClient } from '../src/testing/index.js';
 
 describe('defineTool', () => {
