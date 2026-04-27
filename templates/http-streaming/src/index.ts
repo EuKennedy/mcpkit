@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { defineServer, defineTool } from 'mcp-kit';
+import { defineServer, defineTool } from 'mcpkit';
 import { z } from 'zod';
 
 const mcp = defineServer({

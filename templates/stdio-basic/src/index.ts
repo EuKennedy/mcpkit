@@ -1,4 +1,4 @@
-import { defineServer, defineTool } from 'mcp-kit';
+import { defineServer, defineTool } from 'mcpkit';
 import { z } from 'zod';
 
 const server = defineServer({

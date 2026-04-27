@@ -1,9 +1,9 @@
-# mcp-kit
+# mcpkit
 
-[![ci](https://github.com/EuKennedy/mcp-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/EuKennedy/mcp-kit/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/mcp-kit.svg)](https://www.npmjs.com/package/mcp-kit)
-[![node](https://img.shields.io/node/v/mcp-kit.svg)](https://www.npmjs.com/package/mcp-kit)
-[![license](https://img.shields.io/npm/l/mcp-kit.svg)](LICENSE)
+[![ci](https://github.com/EuKennedy/mcpkit/actions/workflows/ci.yml/badge.svg)](https://github.com/EuKennedy/mcpkit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/mcpkit.svg)](https://www.npmjs.com/package/mcpkit)
+[![node](https://img.shields.io/node/v/mcpkit.svg)](https://www.npmjs.com/package/mcpkit)
+[![license](https://img.shields.io/npm/l/mcpkit.svg)](LICENSE)
 
 **The TypeScript toolkit for building MCP servers without the boilerplate.**
 
@@ -13,7 +13,7 @@ schema generation, input validation, error envelopes, transport wiring,
 all done.
 
 ```ts
-import { defineServer, defineTool } from 'mcp-kit';
+import { defineServer, defineTool } from 'mcpkit';
 import { z } from 'zod';
 
 const server = defineServer({
@@ -32,7 +32,7 @@ const server = defineServer({
 await server.start();
 ```
 
-That's a real, functioning MCP server. Run it with `mcp-kit dev` and point any
+That's a real, functioning MCP server. Run it with `mcpkit dev` and point any
 MCP-aware client at it.
 
 ---
@@ -49,7 +49,7 @@ same plumbing every time:
 - wiring up a transport
 - catching errors and converting them into the right `isError` shape
 
-`mcp-kit` collapses all of that into `defineTool` + `defineServer`. The schema
+`mcpkit` collapses all of that into `defineTool` + `defineServer`. The schema
 is generated from your Zod type, validation runs before your handler, errors
 turn into proper protocol responses, and a string return becomes a text
 content block. You stay in the layer that actually matters — what the tool
@@ -57,12 +57,12 @@ does — and skip the layer that doesn't.
 
 ## with vs without
 
-Same tool, written against the bare SDK and against `mcp-kit`:
+Same tool, written against the bare SDK and against `mcpkit`:
 
 <table>
 <tr>
 <th>bare sdk</th>
-<th>mcp-kit</th>
+<th>mcpkit</th>
 </tr>
 <tr>
 <td>
@@ -144,13 +144,13 @@ plus typed handler arguments, plus an `isError` envelope on uncaught throws.
 ## install
 
 ```bash
-npm install mcp-kit zod
+npm install mcpkit zod
 ```
 
 Or scaffold a fresh project (recommended for a first server):
 
 ```bash
-npx mcp-kit create my-server
+npx mcpkit create my-server
 cd my-server
 npm run dev
 ```
@@ -162,10 +162,10 @@ yours and ship.
 ## the cli
 
 ```
-mcp-kit create [target]   scaffold a new server from a template
-mcp-kit dev               run with hot reload (uses tsx under the hood)
-mcp-kit build             compile to dist/
-mcp-kit inspect           launch the official inspector against your server
+mcpkit create [target]   scaffold a new server from a template
+mcpkit dev               run with hot reload (uses tsx under the hood)
+mcpkit build             compile to dist/
+mcpkit inspect           launch the official inspector against your server
 ```
 
 `create` ships with four templates today:
@@ -248,7 +248,7 @@ to correlate. You can plug it into anything: `pino`, `console`, OpenTelemetry,
 your homemade aggregator. There's also a built-in for the simple case:
 
 ```ts
-import { defineServer, consoleLogger, jsonLogger } from 'mcp-kit';
+import { defineServer, consoleLogger, jsonLogger } from 'mcpkit';
 
 const server = defineServer({
   name: 'demo',
@@ -264,14 +264,14 @@ stdio transports.
 
 ## testing
 
-`mcp-kit/testing` exposes an in-process client that talks to your server
+`mcpkit/testing` exposes an in-process client that talks to your server
 over an in-memory transport — no subprocess, no stdio piping, no flaky
 process teardown. Same client a real consumer would use, just routed through
 RAM.
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { createTestClient, expectToolError, snapshotTools } from 'mcp-kit/testing';
+import { createTestClient, expectToolError, snapshotTools } from 'mcpkit/testing';
 import { server } from '../src/index.js';
 
 describe('add', () => {
@@ -322,7 +322,7 @@ tool calls keep working. Observability bugs shouldn't be load-bearing.
 
 ## faq
 
-**Does this lock me into mcp-kit forever?**
+**Does this lock me into mcpkit forever?**
 No. Every helper has an escape hatch — `server.raw` gives you the underlying
 SDK `Server`, and you can `setRequestHandler` on it directly if you need
 something the kit doesn't model yet. The kit is a layer on top, not a
@@ -359,11 +359,11 @@ tools (the in-process client makes this easy), and you're set.
 ## roadmap
 
 - more templates (oauth-protected, edge runtime, drizzle/postgres).
-- a `mcp-kit publish` command that lints + packages + tags a release.
+- a `mcpkit publish` command that lints + packages + tags a release.
 - richer testing helpers (fuzz a tool's input, schema diff against a baseline).
 - optional OpenTelemetry adapter for `onEvent`.
 
-If something's missing, [open an issue](https://github.com/EuKennedy/mcp-kit/issues)
+If something's missing, [open an issue](https://github.com/EuKennedy/mcpkit/issues)
 with a sketch of the API you'd want.
 
 ## license

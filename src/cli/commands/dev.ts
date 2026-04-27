@@ -32,11 +32,11 @@ function resolveTsxBin(): string {
   // First try a peer install in the consumer project.
   const local = resolve(process.cwd(), 'node_modules/tsx/dist/cli.mjs');
   if (existsSync(local)) return local;
-  // Fall back to the copy bundled with mcp-kit itself.
+  // Fall back to the copy bundled with mcpkit itself.
   const cwd = process.cwd();
   let dir = cwd;
   for (let i = 0; i < 8; i++) {
-    const candidate = resolve(dir, 'node_modules/mcp-kit/node_modules/tsx/dist/cli.mjs');
+    const candidate = resolve(dir, 'node_modules/mcpkit/node_modules/tsx/dist/cli.mjs');
     if (existsSync(candidate)) return candidate;
     const parent = resolve(dir, '..');
     if (parent === dir) break;
@@ -50,7 +50,7 @@ function resolveTsxBin(): string {
     // ignore
   }
   log.error(
-    'tsx not found. it should be installed transitively via mcp-kit; run `npm install` in your project.',
+    'tsx not found. it should be installed transitively via mcpkit; run `npm install` in your project.',
   );
   process.exit(1);
 }

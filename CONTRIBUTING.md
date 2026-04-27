@@ -6,8 +6,8 @@ with the change, not after. keep PRs focused.
 ## local setup
 
 ```bash
-git clone https://github.com/EuKennedy/mcp-kit.git
-cd mcp-kit
+git clone https://github.com/EuKennedy/mcpkit.git
+cd mcpkit
 npm install
 npm test
 ```

@@ -3,6 +3,14 @@
 all notable changes will land here. dates are ISO-8601, format follows
 [keep a changelog](https://keepachangelog.com).
 
+## [0.1.1] — 2026-04-27
+
+### changed
+
+- package and repo renamed from `mcp-kit` to `mcpkit` (the dashed name was
+  taken on npm). github redirects from the old slug, but please update any
+  imports: `from 'mcp-kit'` → `from 'mcpkit'`.
+
 ## [0.1.0] — 2026-04-27
 
 ### added

@@ -18,7 +18,7 @@ export function resolveTemplatesDir(): string {
   for (const candidate of candidates) {
     if (existsSync(candidate)) return candidate;
   }
-  throw new Error('Could not locate the templates directory inside mcp-kit.');
+  throw new Error('Could not locate the templates directory inside mcpkit.');
 }
 
 export function resolvePackageRoot(): string {
@@ -27,5 +27,5 @@ export function resolvePackageRoot(): string {
   for (const candidate of candidates) {
     if (existsSync(resolve(candidate, 'package.json'))) return candidate;
   }
-  throw new Error('Could not locate the mcp-kit package root.');
+  throw new Error('Could not locate the mcpkit package root.');
 }

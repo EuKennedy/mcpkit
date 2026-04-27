@@ -1,6 +1,6 @@
 # __PROJECT_NAME__
 
-An MCP server scaffolded with [mcp-kit](https://github.com/EuKennedy/mcp-kit).
+An MCP server scaffolded with [mcpkit](https://github.com/EuKennedy/mcpkit).
 
 It exposes three example tools (`add`, `reverse`, `now`) over stdio. Use it
 as a starting point and replace the tools with whatever your server should
@@ -26,7 +26,7 @@ node /absolute/path/to/__PROJECT_NAME__/dist/index.js
 …or during development:
 
 ```bash
-npx mcp-kit dev
+npx mcpkit dev
 ```
 
 ## Add a tool

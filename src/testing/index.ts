@@ -4,7 +4,7 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import type { DefinedServer } from '../core/defineServer.js';
 
 export interface TestClientOptions {
-  /** Name advertised by the test client. Default: "mcp-kit-test". */
+  /** Name advertised by the test client. Default: "mcpkit-test". */
   name?: string;
   /** Version advertised by the test client. Default: "0.0.0". */
   version?: string;
@@ -51,7 +51,7 @@ export async function createTestClient(
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
 
   const client = new Client(
-    { name: options.name ?? 'mcp-kit-test', version: options.version ?? '0.0.0' },
+    { name: options.name ?? 'mcpkit-test', version: options.version ?? '0.0.0' },
     { capabilities: {} },
   );
 

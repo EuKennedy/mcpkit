@@ -1,7 +1,7 @@
 # __PROJECT_NAME__
 
 An MCP server that wraps `fetch` for use as agent tools. Scaffolded with
-[mcp-kit](https://github.com/EuKennedy/mcp-kit).
+[mcpkit](https://github.com/EuKennedy/mcpkit).
 
 It ships three tools out of the box:
 
