@@ -1,0 +1,33 @@
+name: bug
+description: something is broken
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: what happened?
+      description: what did you try, what did you expect, what actually happened
+      placeholder: |
+        I ran `mcp-kit create my-server` and ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: minimal repro
+      description: smallest snippet that reproduces the issue
+      render: typescript
+  - type: input
+    id: version
+    attributes:
+      label: mcp-kit version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: node version
+      placeholder: 22.x
+    validations:
+      required: true

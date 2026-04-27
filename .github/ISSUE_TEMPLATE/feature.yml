@@ -1,0 +1,17 @@
+name: feature request
+description: suggest a new template, helper, or capability
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: what's the problem?
+      description: what's painful right now? skip the solution for a sec.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: proposal
+      description: how would this look in code or in the cli?
+      render: typescript
