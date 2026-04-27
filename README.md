@@ -1,9 +1,9 @@
 # mcpkit
 
 [![ci](https://github.com/EuKennedy/mcpkit/actions/workflows/ci.yml/badge.svg)](https://github.com/EuKennedy/mcpkit/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/mcpkit.svg)](https://www.npmjs.com/package/mcpkit)
-[![node](https://img.shields.io/node/v/mcpkit.svg)](https://www.npmjs.com/package/mcpkit)
-[![license](https://img.shields.io/npm/l/mcpkit.svg)](LICENSE)
+[![release](https://img.shields.io/github/v/release/EuKennedy/mcpkit?label=release&color=blue)](https://github.com/EuKennedy/mcpkit/releases)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![node](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](package.json)
 
 **The TypeScript toolkit for building MCP servers without the boilerplate.**
 
