@@ -43,6 +43,11 @@ jobs:
         run: |
           node ./dist/cli.js create /tmp/e2e-stdio -t stdio-basic --no-install -y
           node ./dist/cli.js create /tmp/e2e-http -t http-streaming --no-install -y
+          node ./dist/cli.js create /tmp/e2e-fetch -t with-fetch --no-install -y
+          node ./dist/cli.js create /tmp/e2e-sqlite -t with-sqlite --no-install -y
           test -f /tmp/e2e-stdio/src/index.ts
           test -f /tmp/e2e-http/src/index.ts
+          test -f /tmp/e2e-fetch/src/index.ts
+          test -f /tmp/e2e-sqlite/src/index.ts
+          test -f /tmp/e2e-sqlite/src/db.ts
           grep -q '"name": "e2e-stdio"' /tmp/e2e-stdio/package.json
