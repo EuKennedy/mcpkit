@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import type { EventListener } from './events.js';
 
 /**
  * Anything a tool handler can return. Strings get wrapped as text content
@@ -51,6 +52,8 @@ export interface ServerOptions {
   prompts?: PromptDefinition[];
   /** Called when a tool throws. Defaults to returning the error as text content with isError=true. */
   onToolError?: (err: unknown, toolName: string) => ToolResult;
+  /** Subscribe to lifecycle events (tool.start/end/error, resource.read, prompt.get). */
+  onEvent?: EventListener;
 }
 
 export type TransportKind = 'stdio' | 'http';
