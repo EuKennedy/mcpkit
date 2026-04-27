@@ -1,5 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import type { DefinedServer } from '../core/defineServer.js';
 
 export interface TestClientOptions {
@@ -111,4 +112,48 @@ export async function createTestClient(
       await server.stop();
     },
   };
+}
+
+/**
+ * Return a snapshot of every tool in the server with its description and
+ * generated JSON Schema. Pair it with `expect(...).toMatchSnapshot()` to fail
+ * fast when the public surface drifts unintentionally.
+ */
+export function snapshotTools(
+  server: DefinedServer,
+): Array<{ name: string; description: string; inputSchema: unknown }> {
+  return server.tools.map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    inputSchema: zodToJsonSchema(tool.input, {
+      target: 'jsonSchema7',
+      $refStrategy: 'none',
+    }),
+  }));
+}
+
+/**
+ * Look up the generated JSON Schema for a single tool by name. Useful when
+ * asserting a specific input shape without snapshotting the whole server.
+ */
+export function getToolSchema(server: DefinedServer, name: string): unknown {
+  const tool = server.tools.find((t) => t.name === name);
+  if (!tool) throw new Error(`tool not registered: ${name}`);
+  return zodToJsonSchema(tool.input, { target: 'jsonSchema7', $refStrategy: 'none' });
+}
+
+/**
+ * Assertion-style helper: call a tool and require it to fail. Returns the
+ * error text for further matching. Throws if the call succeeds.
+ */
+export async function expectToolError(
+  client: TestClient,
+  name: string,
+  args: Record<string, unknown> = {},
+): Promise<string> {
+  const result = await client.callTool(name, args);
+  if (!result.isError) {
+    throw new Error(`expected ${name}() to error, but it succeeded with: ${result.text}`);
+  }
+  return result.text;
 }
