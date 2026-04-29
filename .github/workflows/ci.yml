@@ -38,6 +38,12 @@ jobs:
       - name: build
         run: npm run build
 
+      - name: validate package.json (publint + arethetypeswrong)
+        if: matrix.node == 22 && runner.os == 'Linux'
+        run: |
+          npx -y publint
+          npx -y @arethetypeswrong/cli --pack . --ignore-rules cjs-resolves-to-esm
+
       - name: scaffold a project end-to-end
         shell: bash
         run: |
