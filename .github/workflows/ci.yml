@@ -50,4 +50,20 @@ jobs:
           test -f /tmp/e2e-fetch/src/index.ts
           test -f /tmp/e2e-sqlite/src/index.ts
           test -f /tmp/e2e-sqlite/src/db.ts
+          test -f /tmp/e2e-stdio/.gitignore
           grep -q '"name": "e2e-stdio"' /tmp/e2e-stdio/package.json
+
+      - name: verify npm tarball contents
+        if: matrix.node == 22 && runner.os == 'Linux'
+        shell: bash
+        run: |
+          npm pack --dry-run 2>&1 | tee /tmp/pack.txt
+          # every starter must ship its renamed gitignore so scaffolded
+          # projects don't end up tracking node_modules/dist
+          for t in stdio-basic http-streaming with-fetch with-sqlite; do
+            grep -q "templates/$t/_gitignore" /tmp/pack.txt
+          done
+          # the dist must be there or the bin won't resolve
+          grep -q "dist/cli.js" /tmp/pack.txt
+          grep -q "dist/index.js" /tmp/pack.txt
+          grep -q "dist/testing.js" /tmp/pack.txt
